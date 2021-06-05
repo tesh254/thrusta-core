@@ -12,6 +12,7 @@ export function authenticate(req: Request, res: Response) {
     }).then(Res => {
         res.status(201).json(Res)
     }).catch(err => {
+        console.log(err)
         res.status(400).json(err)
     })
 }
@@ -27,4 +28,18 @@ export function updateAccount(req: Request, res: Response) {
         .catch(err => {
             res.status(err.status || 400).json(err)
         })
+}
+
+export function generateJWT(req: Request, res: Response) {
+    const identifier: any = req.query.uid;
+
+    new UserController().generateJWT(identifier)
+        .then(Res => {
+            return res.status(201).json(Res)
+        }).catch(err => {
+            return res.status(err.status || 400).json({
+                message: err.message
+            })
+        })
+
 }

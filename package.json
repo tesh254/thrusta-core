@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "build": "./node_modules/.bin/ts-node build.ts",
-    "lint": "eslint . --ext .ts",
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon",
-    "test": "nodemon --config ./spec/nodemon.json"
+    "test": "nodemon --config ./spec/nodemon.json",
+    "lint": "npx eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
   },
   "nodemonConfig": {
     "watch": [
@@ -59,7 +59,7 @@
     "build.ts"
   ],
   "dependencies": {
-    "@prisma/client": "^2.22.1",
+    "@prisma/client": "^2.23.0",
     "airtable": "^0.11.0",
     "axios": "^0.21.1",
     "bullmq": "^1.25.1",
@@ -89,13 +89,16 @@
     "@types/morgan": "^1.9.2",
     "@types/node": "^14.14.41",
     "@types/supertest": "^2.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.24.0",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "find": "^0.3.0",
     "fs-extra": "^9.1.0",
     "jasmine": "^3.7.0",
     "nodemon": "^2.0.7",
+    "prettier": "^2.3.0",
     "prisma": "^2.21.2",
     "supertest": "^6.1.3",
     "ts-node": "^9.1.1",

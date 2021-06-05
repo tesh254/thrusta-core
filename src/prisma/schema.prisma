@@ -29,6 +29,7 @@ model Node {
 
   name       String
   access_key String?
+  iv         String?
   is_active  Boolean
   developer  User     @relation(fields: [dev_id], references: [id])
   dev_id     String

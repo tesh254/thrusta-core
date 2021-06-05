@@ -1,5 +1,3 @@
-import { IPorfolio } from "./portfolio";
-
 enum AUTH_TYPE {
     GOOGLE = "google",
     MAGIC = "magic",
@@ -14,6 +12,4 @@ export interface IUser {
     auth_type?: AUTH_TYPE;
 }
 
-export type IAccount = User & {
-    portfolios: Portfolio[];
-}
+export type IAccount = User

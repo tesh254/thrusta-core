@@ -1,17 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import firebase from "../firebase";
 import { IUser } from '@entities/user'
-import { Portfolio, PrismaClient, User } from '@prisma/client'
+import { PrismaClient, User } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 export default class UserController {
     public async authenticateUser(userPayload: IUser): Promise<any> {
+        console.log(userPayload)
+
         const currentUser = await prisma.user.findUnique({
             where: {
                 uid: userPayload.uid
             }
         })
+
+        console.log(currentUser)
 
         if (currentUser) {
             return {
@@ -60,15 +64,10 @@ export default class UserController {
         }
     }
 
-    public async fetchUserByUid(uid: string): Promise<User & {
-        portfolios: Portfolio[];
-    }> {
+    public async fetchUserByUid(uid: string): Promise<User> {
         const user = await prisma.user.findUnique({
             where: {
                 uid,
-            },
-            include: {
-                portfolios: true
             }
         })
 
@@ -96,9 +95,6 @@ export default class UserController {
             const account = await prisma.user.findUnique({
                 where: {
                     uid: result.uid,
-                },
-                include: {
-                    portfolios: true
                 }
             })
             if (account.uid) {
@@ -115,5 +111,20 @@ export default class UserController {
         }) => res.send({
             message: `Problem logging you in ${err.message}`
         }).status(403))
+    }
+
+    public async generateJWT(uid: string) {
+        try {
+            const result = await firebase.auth().createCustomToken(uid)
+
+            return {
+                token: result
+            }
+        } catch (err) {
+            throw {
+                status: 400,
+                message: "Cannot log in please try again"
+            }
+        }
     }
 }

@@ -18,4 +18,6 @@ router.get(`/getStatus`, (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json(res.locals.account)
 })
 
+router.post(`/generateToken`, UserMiddleware.generateJWT);
+
 export default router;

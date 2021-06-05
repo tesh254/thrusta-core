@@ -19,6 +19,7 @@ CREATE TABLE "Node" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "access_key" TEXT,
+    "iv" TEXT,
     "is_active" BOOLEAN NOT NULL,
     "dev_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
