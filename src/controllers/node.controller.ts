@@ -1,10 +1,10 @@
 import { INodePayload } from '@entities/node';
 import { PrismaClient, Node } from '@prisma/client'
-import { encrypt } from 'src/utils/keys';
+import uuidApiKey from "uuid-apikey";
 
 const prisma = new PrismaClient();
 
-const secretKey = "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B";
+// const secretKey = "489402f90222226116956ab7cd2cb97f1961b796737fc8c06f6ac7ab764a5976";
 
 export default class NodeController {
     public async createNode(nodePayload: INodePayload): Promise<any> {
@@ -16,15 +16,15 @@ export default class NodeController {
             }
         })
 
-        const hash = encrypt(newNode.id, secretKey)
+        const hash = uuidApiKey.create()
 
         const updateNode = await prisma.node.update({
             where: {
                 id: newNode.id,
             },
             data: {
-                access_key: hash.content || newNode.access_key,
-                iv: hash.iv || newNode.iv
+                api_key: hash.apiKey,
+                api_key_uuid: hash.uuid
             }
         })
 
@@ -32,19 +32,71 @@ export default class NodeController {
     }
 
     public async generateNodeKey(nodeId: string): Promise<Node> {
-        const hash = encrypt(nodeId, secretKey)
+        const hash = uuidApiKey.create()
 
         const updateNode = await prisma.node.update({
             where: {
                 id: nodeId,
             },
             data: {
-                access_key: hash.content,
-                iv: hash.iv
+                api_key: hash.apiKey,
+                api_key_uuid: hash.uuid
             }
         })
 
         return updateNode
+    }
+
+    public async verifyNode(apiKey: string, nodeUUID: string): Promise<Node> {
+        if (nodeUUID && apiKey) {
+            const node = await prisma.node.findUnique({
+                where: {
+                    id: nodeUUID,
+                }
+            })
+
+            if (node?.id) {
+                if (node.api_key === apiKey) {
+                    if (uuidApiKey.check(apiKey, node.api_key_uuid)) {
+                        return node
+                    } else {
+                        throw {
+                            message: "Invalid API Key",
+                            status: 401
+                        }
+                    }
+                } else {
+                    throw {
+                        message: "API keys don't match",
+                        status: 401
+                    }
+                }
+            } else {
+                throw {
+                    message: "Node not verified",
+                    status: 403
+                }
+            }
+        } else {
+            throw {
+                message: "Provide API and Node uuid arguments",
+                status: 400
+            }
+        }
+    }
+
+    public async activateNode(nodeId: string): Promise<Node> {
+        const node = await prisma.node.update({
+            where: {
+                id: nodeId
+            },
+            data: {
+                activated_at: new Date().toISOString()
+            }
+        })
+
+
+        return node
     }
 
     public async getAllNodes(devId: string): Promise<Node[]> {

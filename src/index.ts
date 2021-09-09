@@ -14,6 +14,14 @@ tcpServer.listen(tcpPort, "127.0.0.1", () => {
     logger.info("TCP server has started: " + tcpPort);
 })
 
+tcpServer.on("connection", () => {
+    console.log("A node just connected")
+})
+
+tcpServer.on("data", data => {
+    console.log('Received: ' + data);
+})
+
 app.listen(port, () => {
     logger.info('Express server started on port: ' + port);
 });

@@ -2,24 +2,34 @@ import { Request, Response, NextFunction } from "express";
 import firebase from "../firebase";
 import { IUser } from '@entities/user'
 import { PrismaClient, User } from '@prisma/client'
+import { decodeToken, generateToken } from "src/utils/jwt";
 
 const prisma = new PrismaClient()
 
 export default class UserController {
     public async authenticateUser(userPayload: IUser): Promise<any> {
-        console.log(userPayload)
-
         const currentUser = await prisma.user.findUnique({
             where: {
-                uid: userPayload.uid
+                email: userPayload.email
             }
         })
 
-        console.log(currentUser)
-
         if (currentUser) {
+            const updateUser = await prisma.user.update({
+                where: {
+                    uid: currentUser.uid,
+                },
+                data: {
+                    name: userPayload.name,
+                    avatar: userPayload.avatar
+                }
+            })
+
             return {
-                user: currentUser
+                user: updateUser,
+                token: generateToken({
+                    uid: updateUser.uid
+                })
             }
         } else {
             const result = await prisma.user.create({
@@ -33,7 +43,12 @@ export default class UserController {
                 }
             })
 
-            return { user: result };
+            return {
+                user: result,
+                token: generateToken({
+                    uid: result.uid
+                })
+            };
         }
     }
 
@@ -74,7 +89,7 @@ export default class UserController {
         return user
     }
 
-    public verifyToken(req: Request, res: Response, next: NextFunction) {
+    public async verifyToken(req: Request, res: Response, next: NextFunction) {
         const headerToken: string = req.headers.authorization || "Bearer ";
 
         if (!headerToken) {
@@ -86,36 +101,54 @@ export default class UserController {
         }
 
         if (headerToken && headerToken.split(" ")[0] !== "Bearer") {
-            res.send({ message: "Invalid session", logout: true })
+            res.status(403).send({ message: "Invalid session", logout: true })
         }
 
         const token = headerToken.split(" ")[1];
 
-        firebase.auth().verifyIdToken(token).then(async (result: firebase.auth.DecodedIdToken) => {
-            const account = await prisma.user.findUnique({
-                where: {
-                    uid: result.uid,
-                }
-            })
-            if (account.uid) {
-                res.locals.account = account;
+        const { uid } = decodeToken(token);
 
-                next()
-            } else {
-                throw {
-                    message: "Account not found, create one or log in"
-                }
+        const account = await prisma.user.findUnique({
+            where: {
+                uid,
             }
-        }).catch((err: {
-            message: string
-        }) => res.send({
-            message: `Problem logging you in ${err.message}`
-        }).status(403))
+        })
+        if (account.uid) {
+            res.locals.account = account;
+
+            next()
+        } else {
+            res.send({
+                message: "Account not found, create one or log in"
+            }).status(403)
+        }
+        // firebase.auth().verifyIdToken(token).then(async (result: firebase.auth.DecodedIdToken) => {
+        //     const account = await prisma.user.findUnique({
+        //         where: {
+        //             uid: result.uid,
+        //         }
+        //     })
+        //     if (account.uid) {
+        //         res.locals.account = account;
+
+        //         next()
+        //     } else {
+        //         throw {
+        //             message: "Account not found, create one or log in"
+        //         }
+        //     }
+        // }).catch((err: {
+        //     message: string
+        // }) => res.send({
+        //     message: `Problem logging you in ${err.message}`
+        // }).status(403))
     }
 
     public async generateJWT(uid: string) {
         try {
-            const result = await firebase.auth().createCustomToken(uid)
+            const result = generateToken({
+                uid
+            })
 
             return {
                 token: result

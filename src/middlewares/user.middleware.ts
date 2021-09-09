@@ -2,17 +2,17 @@ import { Response, Request } from "express";
 import UserController from "../controllers/user.controller";
 
 export function authenticate(req: Request, res: Response) {
-    const { user: { uid, avatar, email, auth_type } } = req.body;
+    const { user: { uid, avatar, email, auth_type, name } } = req.body;
 
     new UserController().authenticateUser({
         uid,
         avatar,
         email,
-        auth_type
+        auth_type,
+        name
     }).then(Res => {
         res.status(201).json(Res)
     }).catch(err => {
-        console.log(err)
         res.status(400).json(err)
     })
 }

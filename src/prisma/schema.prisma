@@ -27,12 +27,13 @@ model User {
 model Node {
   id String @id @default(uuid())
 
-  name       String
-  access_key String?
-  iv         String?
-  is_active  Boolean
-  developer  User     @relation(fields: [dev_id], references: [id])
-  dev_id     String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  name         String
+  api_key      String?
+  api_key_uuid String?
+  is_active    Boolean
+  developer    User      @relation(fields: [dev_id], references: [id])
+  dev_id       String
+  activated_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 }
