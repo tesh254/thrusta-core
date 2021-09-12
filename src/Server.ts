@@ -13,6 +13,7 @@ import 'express-async-errors';
 import logger from '@shared/Logger';
 import UserRoutes from "./routes/user.route";
 import NodeRoutes from "./routes/node.route";
+import StatusRoutes from './routes/status.route';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
@@ -47,6 +48,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.use("/api", UserRoutes);
 app.use("/api/nodes", NodeRoutes);
+app.use("/api/status", StatusRoutes)
 // app.use("/api/airtable", AirtableRoutes);
 
 /************************************************************************************
