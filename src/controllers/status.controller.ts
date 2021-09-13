@@ -21,6 +21,9 @@ export default class StatusController {
                 cpu_usage_avg: statusPayload.cpu_usage_avg,
                 cpu_free_avg: statusPayload.cpu_free_avg,
                 cpus,
+                storage_used: statusPayload.storage_used,
+                storage_total: statusPayload.storage_total,
+                storage_free: statusPayload.storage_free
             }
         })
 

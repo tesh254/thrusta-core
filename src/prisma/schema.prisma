@@ -55,6 +55,9 @@ model Status {
   cpu_total      Int      @default(0)
   cpu_usage_avg  Int      @default(0)
   cpu_free_avg   Int      @default(0)
+  storage_used   Int      @default(0)
+  storage_total  Int      @default(0)
+  storage_free   Int      @default(0)
   cpus           Json
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt

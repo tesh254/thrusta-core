@@ -29,6 +29,9 @@ export interface IStatusPayload {
     cpu_total: number;
     cpu_usage_avg: number;
     cpu_free_avg: number;
+    storage_used: number;
+    storage_total: number;
+    storage_free: number;
     cpus: CPU[];
     created_at: string;
     updated_at: string;
