@@ -22,6 +22,7 @@ export interface IStatusPayload {
     ram_available: number;
     ram_total: number;
     ram_used: number;
+    ram_cached: number;
     server_uptime: number;
     swap_available: number;
     swap_total: number;
@@ -29,6 +30,7 @@ export interface IStatusPayload {
     cpu_total: number;
     cpu_usage_avg: number;
     cpu_free_avg: number;
+    cpu_count: number;
     storage_used: number;
     storage_total: number;
     storage_free: number;

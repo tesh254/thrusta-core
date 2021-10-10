@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Status" ADD COLUMN     "cpu_count" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "ram_cached" INTEGER NOT NULL DEFAULT 0;

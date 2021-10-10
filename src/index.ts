@@ -2,6 +2,8 @@ import Net from "net";
 import './pre-start'; // Must be the first import
 import app from '@server';
 import logger from '@shared/Logger';
+import "./queues";
+import { addStatsToQueue } from "./queues/jobs";
 
 
 // Start the server
@@ -17,10 +19,10 @@ tcpServer.listen(tcpPort, "127.0.0.1", () => {
 tcpServer.on("connection", (sock) => {
     console.log("A node just connected")
 
-    sock.write("Welcome server")
+    sock.write("Details received")
 
-    sock.on("data", data => {
-        console.log('Received: ' + data);
+    sock.on("data", async (data: any) => {
+        await addStatsToQueue(JSON.parse(data))
         tcpServer.emit("close")
     })
 
@@ -28,7 +30,7 @@ tcpServer.on("connection", (sock) => {
         console.log('Closing connection with the client');
     });
 
-    sock.on('error', function(err) {
+    sock.on('error', function (err) {
         console.log(`Error: ${err}`);
     });
 })

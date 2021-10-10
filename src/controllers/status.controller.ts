@@ -1,18 +1,20 @@
 import { PrismaClient, Node, Prisma } from '@prisma/client';
 import { IStatusPayload, IReportPayload } from '@entities/status'
+import NodeController from '../controllers/node.controller';
 
 const prisma = new PrismaClient();
 
+const nodeController = new NodeController()
+
 export default class StatusController {
     public async createStatus(statusPayload: IStatusPayload, nodeStatus: string): Promise<any> {
-        const cpus = statusPayload.cpus as Prisma.JsonArray;
-
         const newStatus = await prisma.status.create({
             data: {
                 node_id: statusPayload.node_id,
                 ram_available: statusPayload.ram_available,
                 ram_total: statusPayload.ram_total,
                 ram_used: statusPayload.ram_used,
+                ram_cached: statusPayload.ram_cached,
                 server_uptime: statusPayload.server_uptime,
                 swap_available: statusPayload.swap_available,
                 swap_used: statusPayload.swap_used,
@@ -20,7 +22,6 @@ export default class StatusController {
                 cpu_total: statusPayload.cpu_total,
                 cpu_usage_avg: statusPayload.cpu_usage_avg,
                 cpu_free_avg: statusPayload.cpu_free_avg,
-                cpus,
                 storage_used: statusPayload.storage_used,
                 storage_total: statusPayload.storage_total,
                 storage_free: statusPayload.storage_free
@@ -37,6 +38,28 @@ export default class StatusController {
         return {
             status: newStatus,
             report: newReport
+        }
+    }
+
+    public async nodeStatusUpdate(statusPayload: IStatusPayload, nodeStatus: string, nodeCreds: {
+        api_key: string;
+        node_uuid: string;
+    }): Promise<any> {
+        try {
+            const verifyNode = await nodeController.verifyNode(nodeCreds.api_key, nodeCreds.node_uuid);
+
+            if (verifyNode?.id) {
+                const newStatus = await this.createStatus(statusPayload, nodeStatus);
+
+                return newStatus;
+            } else {
+                throw {
+                    status: 403,
+                    message: "Not authorized"
+                }
+            }
+        } catch (error) {
+            throw error;
         }
     }
 
