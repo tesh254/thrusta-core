@@ -12,10 +12,10 @@ export const systemStatsWorker = new Worker(STAT_QUEUE_NAME, async (job: any) =>
                 api_key
             }, system_stats: {
                 uptime: server_uptime,
-                memory_used: ram_used,
-                memory_available: ram_available,
-                memory_total: ram_total,
-                memory_cached: ram_cached,
+                ram_used,
+                ram_available,
+                ram_total,
+                ram_cached,
                 cpu_used: cpu_usage_avg,
                 cpu_free: cpu_free_avg,
                 cpu_total,
@@ -26,7 +26,9 @@ export const systemStatsWorker = new Worker(STAT_QUEUE_NAME, async (job: any) =>
         const newStatus = await statusController.nodeStatusUpdate({
             node_id,
             ram_available,
-            ram_cached, ram_total, ram_used,
+            ram_cached,
+            ram_total: ram_total,
+            ram_used,
             cpu_usage_avg,
             cpu_total,
             cpu_free_avg,

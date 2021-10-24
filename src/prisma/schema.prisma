@@ -46,7 +46,7 @@ model Status {
   node           Node     @relation(fields: [node_id], references: [id])
   node_id        String
   ram_available  Int      @default(0)
-  ram_total      Int      @default(0)
+  ram_total      Int
   ram_used       Int      @default(0)
   ram_cached     Int      @default(0)
   server_uptime  Int      @default(0)

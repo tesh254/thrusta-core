@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "Status" ADD COLUMN     "storage_free" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "storage_total" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "storage_used" INTEGER NOT NULL DEFAULT 0;
